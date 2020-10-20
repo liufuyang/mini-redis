@@ -1,12 +1,6 @@
-[package]
-name = "my-redis"
-version = "0.1.0"
-authors = ["Fuyang Liu <fuyangl@spotify.com>"]
-edition = "2018"
+[workspace]
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dependencies]
-tokio = { version = "0.3", features = ["full"] }
-mini-redis = "0.2"
-tokio-compat-02 = "0.1.1"
+members = [
+    "mini-redis-fuyang",
+    "my-redis",
+]
