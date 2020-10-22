@@ -1,8 +1,23 @@
+pub mod cmd;
+pub use cmd::Command;
+
 mod connection;
 pub use connection::Connection;
 
 pub mod frame;
 pub use frame::Frame;
+
+mod db;
+use db::Db;
+
+mod parse;
+use parse::{Parse, ParseError};
+
+// mod buffer;
+// pub use buffer::{buffer, Buffer};
+
+mod shutdown;
+use shutdown::Shutdown;
 
 /// Error returned by most functions.
 ///

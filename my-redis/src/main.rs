@@ -1,5 +1,5 @@
-use tokio::net::{TcpListener, TcpStream};
 use mini_redis_fuyang::{Connection, Frame};
+use tokio::net::{TcpListener, TcpStream};
 
 #[tokio::main]
 async fn main() {
@@ -18,15 +18,34 @@ async fn main() {
 }
 
 async fn process(socket: TcpStream) {
-    // The `Connection` lets us read/write redis **frames** instead of
-    // byte streams. The `Connection` type is defined by mini-redis.
+    use mini_redis_fuyang::Command::{self, Get, Set};
+    use std::collections::HashMap;
+
+    // A hashmap is used to store data
+    let mut db = HashMap::new();
+
+    // Connection, provided by `mini-redis`, handles parsing frames from
+    // the socket
     let mut connection = Connection::new(socket);
 
-    if let Some(frame) = connection.read_frame().await.unwrap() {
-        println!("GOT: {:?}", frame);
+    // Use `read_frame` to receive a command from the connection.
+    while let Some(frame) = connection.read_frame().await.unwrap() {
+        let response = match Command::from_frame(frame).unwrap() {
+            Set(cmd) => {
+                db.insert(cmd.key().to_string(), cmd.value().clone());
+                Frame::Simple("OK".to_string())
+            }
+            Get(cmd) => {
+                if let Some(value) = db.get(cmd.key()) {
+                    Frame::Bulk(value.clone())
+                } else {
+                    Frame::Null
+                }
+            }
+            cmd => panic!("unimplemented {:?}", cmd),
+        };
 
-        // Respond with an error
-        let response = Frame::Error("unimplemented".to_string());
+        // Write the response to the client
         connection.write_frame(&response).await.unwrap();
     }
 }
