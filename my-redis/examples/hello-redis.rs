@@ -1,5 +1,4 @@
 use mini_redis::{client, Result};
-// use tokio_compat_02::FutureExt; // To try with tokio 0.3, needs the compat() method from this trait to let tokio 0.2 code working. https://tokio.rs/blog/2020-10-tokio-0-3
 
 #[tokio::main]
 pub async fn main() -> Result<()> {
